@@ -95,7 +95,7 @@ def _scan_recursive_kernel(xy, lev, cc):
 
 	w = bhpix.width(cc._pix.level)
 	bmap = np.zeros((w, w), dtype=object)
-	cc._scan_recursive(bmap, lev, x, y)
+	cc._scan_recursive(bmap, lev, int(x), int(y))
 
 	yield bmap
 
@@ -318,7 +318,7 @@ class TableCatalog:
 					if tcell not in siblings: # Add only if there's no newer version
 						# check if there are any non-cached data in here
 						try:
-							with tables.openFile(fn) as fp:
+							with tables.open_file(fn) as fp:
 								has_data = len(fp.root.main.table) > 0
 						except tables.exceptions.NoSuchNodeError:
 							has_data = False
@@ -422,7 +422,7 @@ class TableCatalog:
 			m0 = np.zeros((w, w), dtype=np.int32)
 			m1 = bmaps[lev+1]
 			for (i, j) in [(0, 0), (0, 1), (1, 0), (1, 1)]:
-				m0[:,:] = m0[:,:] | m1[i::2, j::2]
+				np.bitwise_or(m0[:,:],m1[i::2, j::2],out=m0[:,:],casting='unsafe')
 			m0 = m0 != 0
 
 			bmaps[lev] = m0
